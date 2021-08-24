@@ -47,7 +47,7 @@
     </div>
 @endif
 
-@if($authMethod === 'standard')
+@if($authMethod === 'standard'&&!(env('DISABLE_USER_MODIFY_PASSWORD')===true))
     <div new-user-password>
         <label class="setting-list-label">{{ trans('settings.users_password') }}</label>
 

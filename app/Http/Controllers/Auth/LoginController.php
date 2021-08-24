@@ -10,9 +10,13 @@ use BookStack\Exceptions\LoginAttemptException;
 use BookStack\Facades\Theme;
 use BookStack\Http\Controllers\Controller;
 use BookStack\Theming\ThemeEvents;
+use CAS_AuthenticationException;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Laravel\Socialite\Facades\Socialite;
 
 class LoginController extends Controller
 {
@@ -213,5 +217,69 @@ class LoginController extends Controller
         throw ValidationException::withMessages([
             $this->username() => [trans('auth.failed')],
         ])->redirectTo('/login');
+    }
+
+    public static function showLoginForm()
+    {
+        return redirect()->route("login.neupass");
+    }
+
+    public function redirectToProvider()
+    {
+        $redirect_url=url("/");
+
+        // Store the previous location for redirect after login
+        $previous = url()->previous('');
+        if ($previous && $previous !== route("login.neupass")) {
+            $isPreviousFromInstance = (strpos($previous, url('/')) === 0);
+            // prevent other sites from using our CAS
+            if ($isPreviousFromInstance) {
+                $redirect_url=$previous;
+            }
+        }
+
+        return Socialite::driver('neupass')
+                        ->redirectUrl(route("login.neupass.callback").'?retUrl='.$redirect_url)
+                        ->redirect();
+    }
+
+    public function handleProviderCallback(Request $request)
+    {
+        try {
+            $user = Socialite::driver('neupass')->user();
+        } catch (CAS_AuthenticationException $exception) {
+            dump($exception->getMessage());
+            return null;
+        }
+
+        // do log in here
+        $count=(array)DB::selectOne("select count(*) as count from users where stuid=?", [$user->getId()]);
+        if ($count['count']===0) {
+            $user_id=DB::table('users')->insertGetId([
+                'name' => $user->getName(),
+                'email' => $user->getId().'@stu.neu.edu.cn',
+                'password' => bcrypt($user->getId().env('USER_PASSWORD_SEED')),
+                'created_at' => \Carbon\Carbon::now()->toDateTimeString(),
+                'updated_at' => \Carbon\Carbon::now()->toDateTimeString(),
+                'email_confirmed' => 0,
+                'slug' => Str::random(150),
+                'stuid' => $user->getId()
+            ]);
+            DB::table('role_user')->insert([
+                'user_id' => $user_id,
+                'role_id' => setting('registration-role')
+            ]);
+        }
+        $res=$this->guard()->attempt(
+            [
+                'stuid'=>$user->getId(),
+                'password'=>$user->getId().env('USER_PASSWORD_SEED')
+            ],
+            false
+        );
+        $request->session()->regenerate();
+        $this->clearLoginAttempts($request);
+
+        return redirect($request->get("retUrl"));
     }
 }

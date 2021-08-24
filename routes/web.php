@@ -3,6 +3,9 @@
 Route::get('/status', 'StatusController@show');
 Route::get('/robots.txt', 'HomeController@getRobots');
 
+Route::get('/login/', 'Auth\LoginController@redirectToProvider')->name("login.neupass");
+Route::get('/login/callback', 'Auth\LoginController@handleProviderCallback')->name("login.neupass.callback");
+
 // Authenticated routes...
 Route::group(['middleware' => 'auth'], function () {
 
@@ -231,8 +234,8 @@ Route::group(['middleware' => 'auth'], function () {
 Route::get('/register/service/{socialDriver}', 'Auth\SocialController@register');
 
 // Login/Logout routes
-Route::get('/login', 'Auth\LoginController@getLogin');
-Route::post('/login', 'Auth\LoginController@login');
+Route::get('/admin/login', 'Auth\LoginController@getLogin');
+Route::post('/admin/login', 'Auth\LoginController@login');
 Route::get('/logout', 'Auth\LoginController@logout');
 Route::get('/register', 'Auth\RegisterController@getRegister');
 Route::get('/register/confirm', 'Auth\ConfirmEmailController@show');
