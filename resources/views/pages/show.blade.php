@@ -79,7 +79,6 @@
 
     <script type="text/javascript"  src="/dist/qrcode.js"></script>
     <script>
-        alert(window.location.href);
         new QRCode(document.getElementById("share-qrcode"), {
             text: window.location.href,
             width: 80,
