@@ -1,4 +1,4 @@
-<form action="{{ url('/login') }}" method="POST" id="login-form" class="mt-l">
+<form action="{{ url('/admin/login') }}" method="POST" id="login-form" class="mt-l">
     {!! csrf_field() !!}
 
     <div class="stretch-inputs">
