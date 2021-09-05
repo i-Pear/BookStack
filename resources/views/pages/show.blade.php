@@ -67,6 +67,29 @@
     @endif
 
     @include('partials.book-tree', ['book' => $book, 'sidebarTree' => $sidebarTree])
+
+    <nav id="page-navigation" class="mb-xl" aria-label="share">
+        <h5>分享本文章</h5>
+        <div class="body">
+            <div class="sidebar-page-nav menu">
+                <div id="share-qrcode"></div>
+            </div>
+        </div>
+    </nav>
+
+    <script type="text/javascript"  src="/dist/qrcode.js"></script>
+    <script>
+        alert(window.location.href);
+        new QRCode(document.getElementById("share-qrcode"), {
+            text: window.location.href,
+            width: 80,
+            height: 80,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    </script>
+
 @stop
 
 @section('right')
