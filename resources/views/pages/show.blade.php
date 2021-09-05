@@ -72,7 +72,9 @@
         <h5>分享本文章</h5>
         <div class="body">
             <div class="sidebar-page-nav menu">
-                <div id="share-qrcode"></div>
+                <a id="share-qrcode-a" href="">
+                    <div id="share-qrcode"></div>
+                </a>
             </div>
         </div>
     </nav>
@@ -87,6 +89,7 @@
             colorLight : "#ffffff",
             correctLevel : QRCode.CorrectLevel.H
         });
+        document.getElementById("share-qrcode-a").href="/dist/qrcode.html?dest="+window.location.href;
     </script>
 
 @stop

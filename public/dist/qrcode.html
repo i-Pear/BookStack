@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>qrcode</title>
+</head>
+<body>
+
+<div id="share-qrcode"></div>
+
+<script type="text/javascript"  src="/dist/app.js"></script>
+<script type="text/javascript"  src="/dist/qrcode.js"></script>
+
+<script>
+  function getQueryVariable(variable)
+  {
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i=0;i<vars.length;i++) {
+      var pair = vars[i].split("=");
+      if(pair[0] == variable){return pair[1];}
+    }
+    return(false);
+  }
+</script>
+
+<script>
+  new QRCode(document.getElementById("share-qrcode"), {
+    text: getQueryVariable("dest"),
+    width: 500,
+    height: 500,
+    colorDark : "#000000",
+    colorLight : "#ffffff",
+    correctLevel : QRCode.CorrectLevel.H
+  });
+</script>
+
+</body>
+</html>
